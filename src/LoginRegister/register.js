@@ -5,8 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './register.css';
-
+import './styles/register.css';
 function Register(props){
     const validEmailRegex = RegExp(/\S+@\S+\.\S+/)
     const validNameRegex = RegExp(/^[aA-zZ\s]+$/)
@@ -108,12 +107,18 @@ function Register(props){
             props.setisRegistered(true);
             alert ("User registered: " + props.firstName);
         }
+        try{
+
+        }
+        catch(error){
+
+        }
     };
     return (
       <div className='register'>
         <div className='form-register'>
           <h2>Registration</h2>
-          <Form>
+          <Form method='POST' action='/signup'>
                 <Row className="mb-3">
                     <Form.Group as={Col} controlId="formGridEmail">
                     <Form.Label>First Name</Form.Label>
@@ -164,11 +169,11 @@ function Register(props){
                     </Form.Group>
 
                     <Form.Group as={Col} controlId="formGridZip">
-                    <Form.Label>Age</Form.Label>
-                    <Form.Control placeholder="Enter Age in Years" type='number'/>
+                    <Form.Label>DOB</Form.Label>
+                    <Form.Control placeholder="Enter Age in Years" type='date'/>
                     </Form.Group>
                 </Row>
-                <Row className="mb-3">
+                {/* <Row className="mb-3">
                    
                     <Form.Group as={Col} controlId="formGridState">
                     <Form.Label style={{textAlign: "left"}}>Question-1</Form.Label>
@@ -180,7 +185,7 @@ function Register(props){
                      <Form.Control/>
                     </Form.Group>
                     
-                </Row>
+                </Row> */}
 
 
                 <div class="col-md-12 text-center">
