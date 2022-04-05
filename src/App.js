@@ -1,6 +1,6 @@
 import Login from './LoginRegister/login';
 import { Route, Routes} from "react-router-dom";
-import Register from './LoginRegister/register';
+import Register from './LoginRegister/signup';
 
 function App() {
   return (
