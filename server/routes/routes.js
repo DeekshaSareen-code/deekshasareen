@@ -2,7 +2,7 @@ const express = require("express");
 const userControllers = require("../controllers/user.controller");
 const router = express.Router();
 
-const API = "http://54.146.192.144:3000";
+const API = "http://3.87.142.56:3000";
 
 router.post("/register",userControllers.register);
 router.post("/login",userControllers.login);
