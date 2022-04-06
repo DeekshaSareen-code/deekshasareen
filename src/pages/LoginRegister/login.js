@@ -6,6 +6,9 @@ import Form from 'react-bootstrap/Form';
 import FloatingLabel from "react-bootstrap-floating-label";
 import {Link} from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { loginuser } from '../../apicalls/usercalls';
+import Amplify from 'aws-amplify';
+
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -13,8 +16,26 @@ function Login() {
 
   
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    localStorage.clear();
+    const person = {email:email, password:password} ;
+    console.log(person)
+        
+    loginuser(person).then((data)=>{
+      console.log("step1")
+      if (data.error) {
+          console.log(data.error)
+          alert(data.error)
+          navigate("/login");
+
+      } else {
+        localStorage.setItem("user", JSON.stringify(data));
+        alert("Logged in");
+        navigate("/dashboard");
+      }
+
+  })
   };
     return (
     <div className="wrapper">
@@ -26,22 +47,21 @@ function Login() {
             controlId="email"
             label="Email address"
             className="mb-3"
+            onChange={(e) => setEmail(e.target.value)}
         >
           <Form.Control
             autoFocus
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
             placeholder="name@exampkkle.com"
           />
           </FloatingLabel>
       &nbsp;
-        <FloatingLabel controlId="password" label="Password" className="mb-3">
+        <FloatingLabel controlId="password" label="Password" className="mb-3" type='password' onChange={(e) => setPassword(e.target.value)}>
        
           <Form.Control
-            type="password"
+            type='password'
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
           />
          </FloatingLabel>

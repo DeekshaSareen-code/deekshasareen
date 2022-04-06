@@ -1,18 +1,17 @@
 import react, { useState } from 'react';
 // import './form.css';
 import './styles/register.css';
-import { registeruser } from '../apicalls/usercalls';
+import { registeruser ,insertUser} from '../../apicalls/usercalls';
 import Button from "react-bootstrap/Button";
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { useNavigate } from 'react-router-dom';
 
-function Register(props){
-    const validEmailRegex = RegExp(/\S+@\S+\.\S+/)
-    const validNameRegex = RegExp(/^[aA-zZ\s]+$/)
+function Register(){
     const [errors, setErrors] = useState({});
     const [password, setpassword] = useState("");
     const [email, setemail] = useState("")
@@ -21,12 +20,48 @@ function Register(props){
     const [confirmpassword, setconfirmpassword] = useState("")
     const [dob, setdob] = useState();
     const [gender, setgender] = useState("");
+    const [q1Ans, setq1Ans] = useState("");
+    const [q2Ans, setq2Ans] = useState("");
+    const [q3Ans, setq3Ans] = useState("");
     const [cognitoerr, setcognitoerr] = useState("");
     const navigate = useNavigate();
     const handleChange = (e) => {
         const { name, value } = e.target;
         switch (name) {
            
+            case 'q1Ans': 
+            if(value.length >0 ) {
+              setq1Ans(value);
+            } else{
+                setErrors({
+                    ...errors,
+                    q1Ans:'Please enter your answer!'
+                })
+
+            }     
+            break;
+            case 'q2Ans': 
+            if(value.length >0 ) {
+                setq2Ans(value);
+            } else{
+                setErrors({
+                    ...errors,
+                    q2Ans:'Please enter your answer!'
+                })
+
+            }     
+            break;
+            case 'q3Ans': 
+            if(value.length >0 ) {
+                setq3Ans(value);
+            } else{
+                setErrors({
+                    ...errors,
+                    q3Ans:'Please enter your answer!'
+                })
+
+            }     
+            break;
             case 'firstName': 
             if(value.length >0 ) {
               setfirstname(value);
@@ -107,7 +142,12 @@ function Register(props){
     const handleSubmit = (e) => {
         e.preventDefault();
         const person = {firstName:firstname, lastName:lastname, email:email, password:password, confirmPassword: confirmpassword, gender: gender, dob: dob} ;
+        const age = calculateAge(dob);
+        console.log(age)
+        console.log(q1Ans)
+        const userCard ={email:email, userName:firstname,  gender: gender, age:age, q1Ans: q1Ans, q2Ans: q2Ans, q3Ans: q3Ans}
         console.log(person)
+        console.log(userCard)
         
             registeruser(person).then((data)=>{
                 console.log("step1")
@@ -116,13 +156,25 @@ function Register(props){
                     console.log(data.error)
                 } else {
                   console.log(data);
-                  navigate("/login", { state:  "User Registered"  });
+                  insertUser(userCard).then((data)=>{
+                      console.log(data)
+                   })
+                   navigate("/login", { state:  "User Registered"  });
+               
                 }
-          
-            }
-         )
+              })
         
     };
+    const calculateAge = (dob) => {
+        var today = new Date();
+        var birthDate = new Date(dob);
+        var age = today.getFullYear() - birthDate.getFullYear();
+        var m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    }
     return (
         <div className='register'>
         <div className='form-register'>
@@ -158,24 +210,38 @@ function Register(props){
                 <div class='col-md-4'>
                 <label for="sel1">Select Gender:</label>
                     <select class="form-control" id="sel1" name='gender'  onChange={handleChange}>
-                        <option>Female</option>
-                        <option>Male</option>
-                        <option> Other</option>
+                        <option>F</option>
+                        <option>M</option>
+                        <option> O</option>
                     </select>
                 </div>
                 <div class='col-md-4'>
                 <label for="sel1">Select Interests:</label>
                     <select class="form-control" id="sel2" name='interests'  onChange={handleChange}>
-                        <option>Female</option>
-                        <option>Male</option>
-                        <option>Other</option>
+                        <option>F</option>
+                        <option>M</option>
+                        <option>O</option>
                     </select>
                 </div>
                 <div class='col-md-4'>
                 <label for="validationServer01" class="form-label">Date of birth</label>
                     <input type="date" class="form-control" id="validationServer01"  name='dob' onChange={handleChange} required />
-              
                 </div>
+              </div>
+              <div class="input-group mb-3">
+                    <span class="input-group-text"  id="inputGroup-sizing-default"> (Q1) I like to..</span>
+                <input type="text" placeholder="Enter Answer" name='q1Ans'  onChange={handleChange} class="form-control" aria-label="Default"  aria-describedby="inputGroup-sizing-default" />
+             
+              </div>
+              <div class="input-group mb-3">
+                     <span class="input-group-text" id="inputGroup-sizing-default"> (Q2) My favourite movie is...</span>
+              <input type="text"  placeholder="Enter Answer"  name='q2Ans'  onChange={handleChange} class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" />
+             
+              </div>
+              <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default"> (Q3) My favourite book is... </span>
+                <input type="text"  placeholder="Enter Answer" class="form-control" name='q3Ans'  onChange={handleChange} aria-label="Default" aria-describedby="inputGroup-sizing-default" />
+             
               </div>
                 
                 <div class="col-md-12 text-center">

@@ -9,7 +9,6 @@ app.use(express.urlencoded({limit: '50mb'}));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 //Routes
 app.use(userRouter);
 
@@ -22,3 +21,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+

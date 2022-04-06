@@ -1,10 +1,14 @@
+const Auth = require('aws-amplify')
 const express = require("express");
 const app = express();
 const jwt = require('jsonwebtoken');
 const AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 require("dotenv").config();
 
+const jwkToPem = require('jwk-to-pem');
+
 const config = require('../../config.json');
+const { CognitoIdentityServiceProvider } = require('aws-sdk');
 
 const poolData = {
     UserPoolId : config.cognito.UserPoolId,
@@ -15,8 +19,6 @@ const poolData = {
 const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
 const register = async (req,res) => {
-   console.log("step3")
-   console.log(req.body.gender)
    const email = req.body.email;
    const givenname = req.body.firstName;
    const familyname = req.body.lastName;
@@ -55,25 +57,78 @@ const register = async (req,res) => {
    const genderAttribute = new AmazonCognitoIdentity.CognitoUserAttribute(genderData);
    const birthdateAttribute = new AmazonCognitoIdentity.CognitoUserAttribute(dobData);
 
+   
    userPool.signUp(email, password, [emailAttribute, family_nameAttribute, given_nameAttribute, genderAttribute, birthdateAttribute],null,(err,data)=>{
        if(err){
            return res
            .status(400)
            .json({ success: false, error: err.message });
    
-       }
+       }  
 
        res.send(data.user)
    })
 };
 
 const login = async (req,res) => {
-    res.render('login')
+    //res.render('login')
+    console.log("step-3")
+
+    const email = req.body.email;
+    const password = req.body.password;
+    console.log(email)
+    console.log(password)
+    const loginDetails = {
+        Username: email,
+        Password: password
+    }
+    const authenticationDetails =  new AmazonCognitoIdentity.AuthenticationDetails(loginDetails);
+    const userDetails = {
+        Username: req.body.email,
+        Pool: userPool
+    }
+    const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userDetails);
+
+    cognitoUser.authenticateUser(authenticationDetails,{
+        onSuccess: result=>{
+            res
+            .status(200)
+           .json({ success: true, token: result.getIdToken().getJwtToken(),userName: req.body.email});
+        },
+        onFailure: err=>{
+            console.log(err);
+            res
+           .status(400)
+           .json({ success: false, error: err.message });
+            // res.redirect('/login')
+        }
+    })
+
 };
+const likeUser = async (req,res) => {
+    console.log('Step-3'+ req.body)
+    res.send(req.body);
+}
 
+const getDashboard = async(req, res)=>{
+    console.log(req.body.username)
+    res.send(req.body);
+}
+const insertUser = async(req, res)=>{
+    console.log(req.body.userName)
+    res.send(req.body);
+}
 
+const getConnection = async(req, res)=>{
+    
+    res.send(req.body);
+}
 
 module.exports = {
     register,
     login,
+    getDashboard,
+    likeUser,
+    insertUser,
+    getConnection
   };
